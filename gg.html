@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quest Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            background-image: url('https://www.transparenttextures.com/patterns/circuit-board-1.png');
+        }
+
+        .game-container {
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+
+        h1 {
+            color: #3a3a3a;
+            margin-bottom: 20px;
+            font-size: 36px;
+        }
+
+        .level-container {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #level-progress-bar {
+            height: 10px;
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        #level-progress {
+            height: 100%;
+            width: 0%;
+            background-color: #4caf50;
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .question-container {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .answer-container {
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 18px;
+            width: 150px;
+            text-align: center;
+            border-radius: 5px;
+            border: 2px solid #ccc;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .score {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #feedback.correct {
+            color: green;
+        }
+
+        #feedback.incorrect {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Math Quest Game</h1>
+        <div class="level-container">
+            <p>Level: <span id="level">1</span></p>
+            <div id="level-progress-bar">
+                <div id="level-progress"></div>
+            </div>
+        </div>
+        <div class="question-container">
+            <p id="question">What is 5 + 3?</p>
+        </div>
+        <div class="answer-container">
+            <input type="number" id="answer" placeholder="Your answer">
+            <button id="submit-btn">Submit</button>
+        </div>
+        <div class="score">
+            <p>Score: <span id="score">0</span></p>
+        </div>
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        let score = 0;
+        let level = 1;
+        let currentQuestion;
+        let currentAnswer;
+        const questionElement = document.getElementById('question');
+        const answerInput = document.getElementById('answer');
+        const submitBtn = document.getElementById('submit-btn');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const feedbackElement = document.getElementById('feedback');
+        const levelProgress = document.getElementById('level-progress');
+
+        const operations = ['+', '-', '*', '/'];
+
+        // Adjust the range of numbers as the level increases
+        const getNumberRange = (level) => {
+            return Math.floor(Math.random() * (level * 10)) + 1;
+        };
+
+        // Generate a random math question based on the current level
+        const generateQuestion = () => {
+            const num1 = getNumberRange(level);
+            const num2 = getNumberRange(level);
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+
+            switch (operation) {
+                case '+':
+                    currentAnswer = num1 + num2;
+                    currentQuestion = `${num1} + ${num2}`;
+                    break;
+                case '-':
+                    currentAnswer = num1 - num2;
+                    currentQuestion = `${num1} - ${num2}`;
+                    break;
+                case '*':
+                    currentAnswer = num1 * num2;
+                    currentQuestion = `${num1} * ${num2}`;
+                    break;
+                case '/':
+                    const temp = num1 * num2;  // Avoiding decimal issues
+                    currentAnswer = temp / num2;
+                    currentQuestion = `${temp} ÷ ${num2}`;
+                    break;
+            }
+
+            questionElement.textContent = `What is ${currentQuestion}?`;
+        };
+
+        // Check the user's answer
+        const checkAnswer = () => {
+            const userAnswer = parseFloat(answerInput.value);
+            if (userAnswer === currentAnswer) {
+                score++;
+                feedbackElement.textContent = 'Correct!';
+                feedbackElement.className = 'correct';
+            } else {
+                feedbackElement.textContent = `Wrong! The correct answer was ${currentAnswer}.`;
+                feedbackElement.className = 'incorrect';
+            }
+
+            scoreElement.textContent = score;
+            answerInput.value = '';
+
+            // Level up after 5 correct answers
+            if (score % 5 === 0) {
+                level++;
+                levelElement.textContent = level;
+                levelProgress.style.width = `${(level % 10) * 10}%`; // Update progress bar based on level
+            }
+
+            generateQuestion();
+        };
+
+        submitBtn.addEventListener('click', checkAnswer);
+
+        // Start the game
+        generateQuestion();
+    </script>
+</body>
+</html>
